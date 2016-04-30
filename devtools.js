@@ -18,7 +18,8 @@ chrome.devtools.network.onRequestFinished.addListener(
 		var xCache = "-";
 		var xRemoteCache = "-"; 
 		var xAkNetwork = "Prod";
-		var xTrueCacheKey = "-"
+		var xTrueCacheKey = "-";
+		var xCacheKey = "";
 
 		for (var i = 0; i < hdrs.length; i++) {
 
@@ -32,6 +33,10 @@ chrome.devtools.network.onRequestFinished.addListener(
 			// X-True-Cache-Key
 			if (hdr.name.toLowerCase() == "x-true-cache-key")
 				xTrueCacheKey = hdr.value.split(' ')[0];
+
+			// X-Cache-Key
+			if (hdr.name.toLowerCase() == "x-cache-key")
+				xCacheKey = hdr.value.split(' ')[0];
 
 			// Set the network (Prod / Staging / ETN)
 			if (hdr.name == "X-Akamai-Staging")
@@ -51,6 +56,8 @@ chrome.devtools.network.onRequestFinished.addListener(
 
 		}
 
+		if (xCacheKey == "")
+			return;
 
 		// Fill in main table
 		var tr = tableAll.insertRow();
@@ -124,6 +131,21 @@ chrome.devtools.network.onRequestFinished.addListener(
 				td.style.backgroundColor = "lightgrey";
 				td.appendChild(document.createTextNode(xTrueCacheKey));
 
+		// CP Code
+		var xCacheKeyArray = xCacheKey.split("/");
+				var td = tr.insertCell();
+				td.style.border = '0px solid black';
+				td.style.foregroundColor = "black";
+				td.style.backgroundColor = "lightgrey";
+				td.appendChild(document.createTextNode(xCacheKeyArray[3]));
+
+		// TTL
+				var td = tr.insertCell();
+				td.style.border = '0px solid black';
+				td.style.foregroundColor = "black";
+				td.style.backgroundColor = "lightgrey";
+				td.appendChild(document.createTextNode(xCacheKeyArray[4]));
+
 		// URL
 				var td = tr.insertCell();
 				td.style.border = '0px solid black';
@@ -190,7 +212,7 @@ function createTables() {
 	td.style.backgroundColor = "black";
 	td.appendChild(document.createTextNode('Content-Length'));
 
-	// X-Cache
+	// X-Cache results
 	var td = tr.insertCell();
 	td.style.border = '0px solid black';
 	td.style.color = "white";
@@ -210,6 +232,20 @@ function createTables() {
 	td.style.color = "white";
 	td.style.backgroundColor = "black";
 	td.appendChild(document.createTextNode('X-True-Cache-Key'));
+
+	// CP Code
+	var td = tr.insertCell();
+	td.style.border = '0px solid black';
+	td.style.color = "white";
+	td.style.backgroundColor = "black";
+	td.appendChild(document.createTextNode('CP Code'));
+
+	// TTL
+	var td = tr.insertCell();
+	td.style.border = '0px solid black';
+	td.style.color = "white";
+	td.style.backgroundColor = "black";
+	td.appendChild(document.createTextNode('TTL'));
 
 	// URL
 	var td = tr.insertCell();
